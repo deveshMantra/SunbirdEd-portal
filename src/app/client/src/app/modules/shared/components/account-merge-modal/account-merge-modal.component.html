@@ -1,0 +1,88 @@
+<!--<sui-modal
+  [mustScroll]="true"
+  [isClosable]="true"
+  [transitionDuration]="0"
+  [size]="'normal'"
+  class="sb-modal"
+  (dismissed)="modal.deny();closeModal()"
+  #modal>
+
+  &lt;!&ndash;Header&ndash;&gt;
+  <div class="sb-modal-header">
+    {{resourceService.frmelmnts?.lbl?.mergeaccount }}
+  </div>
+  &lt;!&ndash;/Header&ndash;&gt;
+
+  &lt;!&ndash;Content&ndash;&gt;
+  <div class="sb-modal-content">
+    <div class="ui grid stackable middle aligned">
+      {{resourceService.messages?.imsg?.m0030}}
+      <ul class="pl-30 pr-30">
+        <li class="d-flex flex-jc-space-between mb-20">{{resourceService.messages?.imsg?.m0032}} </li>
+        <li class="d-flex flex-jc-space-between mb-20"> {{resourceService.messages?.imsg?.m0033}}</li>
+      </ul>
+      {{resourceService.messages?.imsg?.m0031}}
+    </div>
+  </div>
+  &lt;!&ndash;/Content&ndash;&gt;
+
+  &lt;!&ndash;Actions&ndash;&gt;
+  <div class="sb-modal-actions">
+    <button (click)="redirect()" class="sb-btn sb-btn-normal sb-btn-primary" type="button">
+      {{resourceService.frmelmnts?.btn?.merge}}
+    </button>
+    <button class="sb-btn sb-btn-normal sb-btn-primary" (click)="closeModal()">
+      {{resourceService.frmelmnts?.btn?.cancel}}
+    </button>
+  </div>
+  &lt;!&ndash;/Actions&ndash;&gt;
+
+
+</sui-modal>-->
+
+
+<sui-modal
+  [mustScroll]="true"
+  [isClosable]="true"
+  [transitionDuration]="0"
+  [size]="'normal'"
+  class="sb-modal"
+  (dismissed)="modal.deny();closeModal()"
+  #modal>
+
+  <!--Header-->
+  <div class="sb-modal-header">
+    {{resourceService.frmelmnts?.lbl?.mergeaccount }}
+  </div>
+  <!--/Header-->
+
+  <!--Content-->
+  <div class="sb-modal-content">
+    <div class="sb-merge-account-modal">
+      <p class="mb-8"> {{resourceService.messages?.imsg?.m0030}}
+        <b>{{resourceService.frmelmnts?.btn?.merge | titlecase}}</b> {{resourceService.messages?.imsg?.m0050}}:</p>
+      <ul class="m-0">
+        <li class="mb-8">
+          {{resourceService.messages?.imsg?.m0032}}
+        </li>
+        <li class="mb-8">
+          {{resourceService.messages?.imsg?.m0033}}
+        </li>
+      </ul>
+      <p>{{resourceService.messages?.imsg?.m0051}} <b>{{resourceService.frmelmnts?.btn?.cancel}}</b></p>
+    </div>
+  </div>
+  <!--/Content-->
+
+  <!--Actions-->
+  <div class="sb-modal-actions">
+    <button class="sb-btn sb-btn-normal sb-btn-primary" (click)="redirect()">
+      {{resourceService.frmelmnts?.btn?.merge}}
+    </button>
+    <button class="sb-btn sb-btn-normal sb-btn-outline-primary" (click)="closeModal()">
+      {{resourceService.frmelmnts?.btn?.cancel}}
+    </button>
+  </div>
+  <!--/Actions-->
+
+</sui-modal>

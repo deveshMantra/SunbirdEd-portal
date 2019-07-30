@@ -25,11 +25,11 @@
     .sb-certificatePage-header {
       padding: $sb-certificatePage-padding;
     }
-  
+
     .sb-certificatePage-logo {
       height: $sb-certificatePage-logo-height;
     }
-  
+
     .sb-certificatePage-desc {
       background-color: $sb-certificatePage-desc-background;
       padding: $sb-certificatePage-desc-padding;
@@ -38,13 +38,13 @@
       @include respond-above(xs) {
         margin: $sb-certificatePage-desc-margin-desktop;
       }
-  
+
       .sb-certificatePage-desc-img {
         max-width: $sb-certificatePage-desc-img-width;
         margin: 0 auto;
       }
     }
-  
+
     .sb-certificatePage-label {
       font-weight: normal;
       font-size: $sb-certificatePage-label-font-size;
@@ -53,13 +53,13 @@
         display:none;
       }
     }
-  
+
     .sb-certificatePage-field {
       display: flex;
       justify-content: space-between;
       width: $sb-certificatePage-field-width;
       margin: $sb-certificatePage-field-margin;
-  
+
       .sb-certificatePage-input {
         height: $sb-certificatePage-input-height;
         width: $sb-certificatePage-input-width;
@@ -87,12 +87,12 @@
           color: $sb-certificatePage-input-placeholder-color;
           opacity: 1; /* Firefox */
         }
-    
+
         &:-ms-input-placeholder {
           /* Internet Explorer 10-11 */
           color: $sb-certificatePage-input-placeholder-color;
         }
-    
+
         &::-ms-input-placeholder {
           /* Microsoft Edge */
           color: $sb-certificatePage-input-placeholder-color;
@@ -102,7 +102,7 @@
     .sb-certificatePage-field{
       .sb-form-control{
         font-weight: bold;
-        letter-spacing: 4px;  
+        letter-spacing: 4px;
       }
     }
     .sb-certificatePage-holder-details {
@@ -171,4 +171,12 @@
       }
     }
   }
+}
+.sb-or-divider {
+  color: #999999;
+  background-image: linear-gradient(#969696,#969696),linear-gradient(#969696,#969696);
+  background-size: 45% 1px;
+  background-position: center left,center right;
+  background-repeat: no-repeat;
+  text-align: center;
 }
