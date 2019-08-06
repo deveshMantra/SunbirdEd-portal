@@ -44,9 +44,6 @@ const authenticated = function (request) {
     },
     updateLoginTime: function (callback) {
       userHelper.updateLoginTime(request, callback)
-    },
-    logSession: function (callback) {
-      telemetryHelper.logSessionStart(request, callback)
     }
   }, function (err, results) {
     if (err) {

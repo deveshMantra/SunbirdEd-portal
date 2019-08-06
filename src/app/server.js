@@ -70,6 +70,8 @@ require('./routes/ssoRoutes.js')(app, keycloak) // sso routes
 
 require('./routes/refreshTokenRoutes.js')(app, keycloak) // refresh token routes
 
+require('./routes/accountMergeRoute.js')(app, keycloak) // refresh token routes
+
 require('./routes/clientRoutes.js')(app, keycloak) // client app routes
 
 require('./routes/reportRoutes.js')(app, keycloak) // report routes
@@ -98,6 +100,7 @@ require('./proxy/localProxy.js')(app) // Local proxy for content and learner ser
 app.all('/v1/user/session/create', (req, res) => trampolineServiceHelper.handleRequest(req, res, keycloak))
 
 app.get('/v1/user/session/start/:deviceId', (req, res) => {
+  console.log('calling session start');
   if (req.session.logSession === false) {
     req.session.deviceId = req.params.deviceId
     telemetryHelper.logSessionStart(req)
