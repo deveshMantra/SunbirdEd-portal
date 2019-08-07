@@ -4,12 +4,13 @@ const bodyParser = require('body-parser')
 const request = require('request-promise');
 const envHelper = require('./../helpers/environmentVariablesHelper.js')
 const dateFormat = require('dateformat')
-const uuidv1 = require('uuid/v1')
+const uuidv1 = require('uuid/v1');
+const authorizationToken = envHelper.PORTAL_API_AUTH_TOKEN
 
 module.exports = (app) => {
 
   app.get('/merge/account/u1/initiate', (req, res) => {
-    console.log('/merge/account/u1/initiate', req.session.kauth);
+    console.log('/merge/account/u1/initiate', req.session);
     if(!_.get(req, 'kauth.grant.access_token.token')){
       res.status(401).send({
         responseCode: 'UNAUTHORIZED'
@@ -23,24 +24,10 @@ module.exports = (app) => {
       }
     };
     console.log('storing merge account initiator account details', req.session.mergeAccountInfo);
-    console.log('logging out merge account initiator');
-    const url = `${envHelper.PORTAL_AUTH_SERVER_URL}/realms/${envHelper.PORTAL_REALM}/protocol/openid-connect/logout`;
-    const query = '?redirect_uri=http://localhost:3000/merge/account/u2/initiate';
-    res.redirect(url + query)
-  })
-
-  app.get('/merge/account/u2/initiate', (req, res) => {
-    if(!req.session.mergeAccountInfo){
-      res.status(401).send({
-        responseCode: 'UNAUTHORIZED'
-      });
-      return false;
-    }
-    console.log('logging in target account for merge');
-    const url = `${envHelper.PORTAL_AUTH_SERVER_URL}/realms/${envHelper.PORTAL_REALM}/protocol/openid-connect/auth`;
+    const url = `https://merge.dev.sunbirded.org/auth/realms/${envHelper.PORTAL_REALM}/protocol/openid-connect/auth`;
     const query = '?client_id=portal&state=3c9a2d1b-ede9-4e6d-a496-068a490172ee&redirect_uri=http://localhost:3000/merge/account/u2/login/callback&scope=openid&response_type=code&version=2&success_message=Login with account to which you want merge';
     res.redirect(url + query)
-  })
+  });
 
   app.all('/merge/account/u2/login/callback', async (req, res) => {
     if(!req.session.mergeAccountInfo){
@@ -51,12 +38,20 @@ module.exports = (app) => {
     }
     console.log(req.query);
     const u2Token = await verifyAuthToken(req, req.query.code).catch(err => {
-      console.log('error', Object.keys(err))
+      console.log('error', Object.keys(err));
       console.log(err.error);
       console.log('error detals', err.statusCode, err.message)
-    })
+    });
     console.log('target account logged in: getting access token', u2Token);
-    res.send('merge successful')
+    const mergeResponse = await initiateAccountMerge(req, u2Token).catch(err => {
+      console.log('error', err.error);
+      console.log('error detals', err.statusCode, err.message);
+      res.redirect('/accountMerge' +'?status=error');
+    });
+    if (_.get(mergeResponse, 'result.result.status') === 'SUCCESS' && mergeResponse.responseCode === 'OK') {
+      console.log('mergeResponse coming from backend', mergeResponse);
+      res.redirect('/accountMerge' +'?status=success');
+    }
   })
 
 }
@@ -84,7 +79,41 @@ const verifyAuthToken = async (req, code) => {
   console.log('verifyAuthToken', options);
   return request(options);
 }
+
+const initiateAccountMerge = async (req, u2Token) => {
+  if (u2Token) {
+    u2Token = JSON.parse(u2Token);
+  }
+  var jwtPayload = jwt.decode(u2Token.access_token);
+  var userIds = jwtPayload.sub.split(':');
+  var u2userId = userIds[userIds.length - 1];
+  const options = {
+    method: 'PATCH',
+    url: `${envHelper.LEARNER_URL}user/v1/account/merge`,
+    headers: getAccountMergeHeaders(req, u2Token.access_token),
+    form: {
+      "params": {},
+      "request": {
+        "fromAccountId": u2userId,
+        "toAccountId": _.get(req, 'session.mergeAccountInfo.initiatorAccountDetails.userId')
+      }
+    }
+  };
+  console.log('verifyAuthToken sending request for merge', options);
+  return await request(options)
+};
+
 const getHeaders = (req) => {
   return {
+  }
+}
+
+const getAccountMergeHeaders = (req, u2AccessToken) => {
+  return {
+    'x-authenticated-user-token': _.get(req, 'session.mergeAccountInfo.initiatorAccountDetails.sessionToken'),
+    'x-source-user-token': u2AccessToken,
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + authorizationToken,
+
   }
 }
