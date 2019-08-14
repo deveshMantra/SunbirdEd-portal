@@ -6,7 +6,6 @@ const envHelper = require('./../helpers/environmentVariablesHelper.js')
 const dateFormat = require('dateformat')
 const uuidv1 = require('uuid/v1');
 const authorizationToken = envHelper.PORTAL_API_AUTH_TOKEN
-
 module.exports = (app) => {
 
   app.get('/merge/account/u1/initiate', (req, res) => {
@@ -20,7 +19,8 @@ module.exports = (app) => {
     req.session.mergeAccountInfo = {
       initiatorAccountDetails: {
         userId: _.get(req, 'session.userId'),
-        sessionToken: _.get(req, 'kauth.grant.access_token.token')
+        sessionToken: _.get(req, 'kauth.grant.access_token.token'),
+        redirectUri: req.query.redirectUri
       }
     };
     console.log('storing merge account initiator account details', req.session.mergeAccountInfo);
@@ -46,11 +46,15 @@ module.exports = (app) => {
     const mergeResponse = await initiateAccountMerge(req, u2Token).catch(err => {
       console.log('error', err.error);
       console.log('error detals', err.statusCode, err.message);
-      res.redirect('/accountMerge' +'?status=error');
+      const query = '?status=error&redirect_uri=' + req.session.mergeAccountInfo.initiatorAccountDetails.redirectUri;
+      req.session.mergeAccountInfo = null;
+      res.redirect('/accountMerge' + query);
     });
     if (_.get(mergeResponse, 'result.result.status') === 'SUCCESS' && mergeResponse.responseCode === 'OK') {
       console.log('mergeResponse coming from backend', mergeResponse);
-      res.redirect('/accountMerge' +'?status=success');
+      const query = '?status=success&redirect_uri=' + req.session.mergeAccountInfo.redirectUri;
+      req.session.mergeAccountInfo = null;
+      res.redirect('/accountMerge' + query);
     }
   })
 
@@ -91,13 +95,14 @@ const initiateAccountMerge = async (req, u2Token) => {
     method: 'PATCH',
     url: `${envHelper.LEARNER_URL}user/v1/account/merge`,
     headers: getAccountMergeHeaders(req, u2Token.access_token),
-    form: {
+    body: {
       "params": {},
       "request": {
         "fromAccountId": u2userId,
         "toAccountId": _.get(req, 'session.mergeAccountInfo.initiatorAccountDetails.userId')
       }
-    }
+    },
+    json: true
   };
   console.log('verifyAuthToken sending request for merge', options);
   return await request(options)

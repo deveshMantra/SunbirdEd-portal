@@ -10,6 +10,7 @@ import {NavigationHelperService} from '@sunbird/shared';
 export class MergeAccountStatusComponent implements OnInit {
   @ViewChild('modal') modal;
   isMergeSuccess: any = {};
+  redirectUri: string;
 
   constructor(public activatedRoute: ActivatedRoute,
               public navigationHelperService: NavigationHelperService, private router: Router) {
@@ -19,11 +20,12 @@ export class MergeAccountStatusComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       const queryParam = {...queryParams};
       this.isMergeSuccess = queryParam.status === 'success';
+      this.redirectUri = queryParam.redirect_uri || '/resources';
     });
   }
 
   closeModal() {
-    this.router.navigate(['/learn']);
+    window.location.href = this.redirectUri;
     this.modal.deny();
   }
 }
