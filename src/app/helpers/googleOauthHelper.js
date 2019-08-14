@@ -64,7 +64,7 @@ class GoogleOauth {
       throw error.message
     } else {
       throw 'unhandled exception while getting tokens'
-    } 
+    }
   }
 }
 const googleOauth = new GoogleOauth()
@@ -77,8 +77,19 @@ const createSession = async (emailId, reqQuery, req, res) => {
     scope = 'offline_access';
   }
   grant = await keycloakClient.grantManager.obtainDirectly(emailId, undefined, undefined, scope);
-  keycloakClient.storeGrant(grant, req, res)
-  req.kauth.grant = grant
+
+  // merge account in progress
+  if (_.get(req, 'session.mergeAccountInfo.initiatorAccountDetails')) {
+    req.session.mergeAccountInfo.mergeFromAccountDetails = {
+      sessionToken: grant.access_token.token
+  };
+    return {
+      access_token: grant.access_token.token,
+      refresh_token: grant.refresh_token.token
+    };
+  }
+  keycloakClient.storeGrant(grant, req, res);
+  req.kauth.grant = grant;
   keycloakClient.authenticated(req)
   return {
     access_token: grant.access_token.token,

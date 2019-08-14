@@ -36,12 +36,19 @@ module.exports = (app) => {
       });
       return false;
     }
-    console.log(req.query);
-    const u2Token = await verifyAuthToken(req, req.query.code).catch(err => {
-      console.log('error', Object.keys(err));
-      console.log(err.error);
-      console.log('error detals', err.statusCode, err.message)
-    });
+    let u2Token = _.get(req, 'session.mergeAccountInfo.mergeFromAccountDetails.sessionToken');
+    // merge from google sign in progress
+    if (!u2Token) {
+      u2Token = await verifyAuthToken(req, req.query.code).catch(err => {
+        console.log('error', Object.keys(err));
+        console.log(err.error);
+        console.log('error detals', err.statusCode, err.message)
+      });
+      if (u2Token) {
+        u2Token = JSON.parse(u2Token);
+      }
+      u2Token = u2Token.access_token;
+    }
     console.log('target account logged in: getting access token', u2Token);
     const mergeResponse = await initiateAccountMerge(req, u2Token).catch(err => {
       console.log('error', err.error);
@@ -52,7 +59,7 @@ module.exports = (app) => {
     });
     if (_.get(mergeResponse, 'result.result.status') === 'SUCCESS' && mergeResponse.responseCode === 'OK') {
       console.log('mergeResponse coming from backend', mergeResponse);
-      const query = '?status=success&redirect_uri=' + req.session.mergeAccountInfo.redirectUri;
+      const query = '?status=success&redirect_uri=' + req.session.mergeAccountInfo.initiatorAccountDetails.redirectUri;
       req.session.mergeAccountInfo = null;
       res.redirect('/accountMerge' + query);
     }
@@ -85,16 +92,13 @@ const verifyAuthToken = async (req, code) => {
 }
 
 const initiateAccountMerge = async (req, u2Token) => {
-  if (u2Token) {
-    u2Token = JSON.parse(u2Token);
-  }
-  var jwtPayload = jwt.decode(u2Token.access_token);
+  var jwtPayload = jwt.decode(u2Token);
   var userIds = jwtPayload.sub.split(':');
   var u2userId = userIds[userIds.length - 1];
   const options = {
     method: 'PATCH',
     url: `${envHelper.LEARNER_URL}user/v1/account/merge`,
-    headers: getAccountMergeHeaders(req, u2Token.access_token),
+    headers: getAccountMergeHeaders(req, u2Token),
     body: {
       "params": {},
       "request": {
