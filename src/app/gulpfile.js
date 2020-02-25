@@ -60,7 +60,7 @@ gulp.task('client:install', (cb) => {
 })
 
 // To build angular code and rename index file
-const buildScript = process.env.devBuild === 'true' ? 'build-dev' : 'build'
+const buildScript = 'build-dev';
 gulp.task('client:dist', (cb) => {
     exec(`npm run ${buildScript} --prefix ./client `, { maxBuffer: Infinity }, function (err, stdout, stderr) {
         console.log(stdout)
