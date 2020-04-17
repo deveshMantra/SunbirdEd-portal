@@ -17,6 +17,7 @@ const trampolineSecret = envHelper.PORTAL_TRAMPOLINE_SECRET
 const learnerAuthorization = envHelper.PORTAL_API_AUTH_TOKEN
 
 let keycloak = getKeyCloakClient({
+  'token-generation-url': envHelper.PORTAL_AUTH_SERVER_URL_TOKEN,
   clientId: trampolineClientId,
   bearerOnly: true,
   serverUrl: trampolineServerUrl,
@@ -135,7 +136,7 @@ module.exports = {
         getGrantFromUserName: function (callback) {
           self.errorMsg = 'Request credentials verification failed. Please try with valid credentials.'
           var userName = self.userName;
-          keycloak.grantManager.obtainDirectly(userName)
+          keycloak.grantManager.obtainDirectly(userName, null, null, undefined, req.headers)
             .then(function (grant) {
               keycloak.storeGrant(grant, req, res)
               req.kauth.grant = grant

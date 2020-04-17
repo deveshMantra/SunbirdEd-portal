@@ -15,6 +15,7 @@ const keycloakGoogle = getKeyCloakClient({
   resource: envHelper.KEYCLOAK_GOOGLE_CLIENT.clientId,
   bearerOnly: true,
   serverUrl: envHelper.PORTAL_AUTH_SERVER_URL,
+  'token-generation-url': envHelper.PORTAL_AUTH_SERVER_URL_TOKEN,
   realm: envHelper.PORTAL_REALM,
   credentials: {
     secret: envHelper.KEYCLOAK_GOOGLE_CLIENT.secret
@@ -26,6 +27,7 @@ const keycloakMergeGoogle = getKeyCloakClient({
   resource: envHelper.KEYCLOAK_GOOGLE_CLIENT.clientId,
   bearerOnly: true,
   serverUrl: envHelper.PORTAL_MERGE_AUTH_SERVER_URL,
+  'token-generation-url': envHelper.PORTAL_AUTH_SERVER_URL_TOKEN,
   realm: envHelper.PORTAL_REALM,
   credentials: {
     secret: envHelper.KEYCLOAK_GOOGLE_CLIENT.secret
@@ -37,6 +39,7 @@ const keycloakGoogleAndroid = getKeyCloakClient({
   resource: envHelper.KEYCLOAK_GOOGLE_ANDROID_CLIENT.clientId,
   bearerOnly: true,
   serverUrl: envHelper.PORTAL_AUTH_SERVER_URL,
+  'token-generation-url': envHelper.PORTAL_AUTH_SERVER_URL_TOKEN,
   realm: envHelper.PORTAL_REALM,
   credentials: {
     secret: envHelper.KEYCLOAK_GOOGLE_ANDROID_CLIENT.secret
@@ -46,6 +49,7 @@ const keycloakMergeGoogleAndroid = getKeyCloakClient({
   resource: envHelper.KEYCLOAK_GOOGLE_ANDROID_CLIENT.clientId,
   bearerOnly: true,
   serverUrl: envHelper.PORTAL_MERGE_AUTH_SERVER_URL,
+  'token-generation-url': envHelper.PORTAL_AUTH_SERVER_URL_TOKEN,
   realm: envHelper.PORTAL_REALM,
   credentials: {
     secret: envHelper.KEYCLOAK_GOOGLE_ANDROID_CLIENT.secret
@@ -134,7 +138,7 @@ const createSession = async (emailId, reqQuery, req, res) => {
   // merge account in progress
   if (_.get(req, 'session.mergeAccountInfo.initiatorAccountDetails') || reqQuery.merge_account_process === '1') {
     console.log('merge in progress', emailId, reqQuery.client_id);
-    grant = await keycloakMergeClient.grantManager.obtainDirectly(emailId, undefined, undefined, scope);
+    grant = await keycloakMergeClient.grantManager.obtainDirectly(emailId, undefined, undefined, scope, req.headers);
     console.log('grant received', JSON.stringify(grant.access_token.token));
     if (reqQuery.client_id !== 'android') {
       req.session.mergeAccountInfo.mergeFromAccountDetails = {
@@ -147,7 +151,7 @@ const createSession = async (emailId, reqQuery, req, res) => {
     };
   } else {
     console.log('login in progress');
-    grant = await keycloakClient.grantManager.obtainDirectly(emailId, undefined, undefined, scope).catch(function (error) {
+    grant = await keycloakClient.grantManager.obtainDirectly(emailId, undefined, undefined, scope, req.headers).catch(function (error) {
       logger.info({
         msg: 'googleOauthHelper: createSession failed',
         error: error

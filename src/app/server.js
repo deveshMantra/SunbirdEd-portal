@@ -31,6 +31,7 @@ let keycloak = getKeyCloakClient({
   'realm': envHelper.PORTAL_REALM,
   'auth-server-url': envHelper.PORTAL_AUTH_SERVER_URL,
   'ssl-required': 'none',
+  'token-generation-url': envHelper.PORTAL_AUTH_SERVER_URL_TOKEN,
   'resource': envHelper.PORTAL_AUTH_SERVER_CLIENT,
   'public-client': true
 })

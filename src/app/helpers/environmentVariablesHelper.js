@@ -18,6 +18,7 @@ let envVariables = {
   CONTENT_PROXY_URL: env.sunbird_content_proxy_url || 'https://staging.open-sunbird.org',
   PORTAL_REALM: env.sunbird_portal_realm || 'sunbird',
   PORTAL_AUTH_SERVER_URL: env.sunbird_portal_auth_server_url || 'https://staging.open-sunbird.org/auth',
+  PORTAL_AUTH_SERVER_URL_TOKEN: env.sunbird_portal_auth_server_ip_url || 'http://11.2.6.6/auth',
   PORTAL_AUTH_SERVER_CLIENT: env.sunbird_portal_auth_server_client || 'portal',
   PORTAL_API_AUTH_TOKEN: env.sunbird_api_auth_token,
   PORTAL_ECHO_API_URL: env.sunbird_echo_api_url || 'https://staging.open-sunbird.org/api/echo/',
