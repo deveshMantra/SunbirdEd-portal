@@ -98,10 +98,6 @@ class GoogleOauth {
       msg: 'token fetched'
     });
     const plus = google.plus({ version: 'v1', auth: client})
-    const { data } = await plus.people.get({ userId: 'me' }).catch(this.handleError)
-    logger.info({
-      msg: 'fetched user profile'
-    });
     return {
       name: userInfo.name,
       emailId: userInfo.email
