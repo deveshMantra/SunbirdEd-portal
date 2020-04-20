@@ -97,7 +97,6 @@ class GoogleOauth {
     logger.info({
       msg: 'token fetched'
     });
-    const plus = google.plus({ version: 'v1', auth: client})
     return {
       name: userInfo.name,
       emailId: userInfo.email
