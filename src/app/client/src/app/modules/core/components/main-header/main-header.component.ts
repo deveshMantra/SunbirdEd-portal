@@ -67,6 +67,7 @@ export class MainHeaderComponent implements OnInit {
   showOfflineHelpCentre = false;
   contributeTabActive: boolean;
   showExploreComponent: boolean;
+  isSwitchUserAllowed = false;
 
   constructor(public config: ConfigService, public resourceService: ResourceService, public router: Router,
     public permissionService: PermissionService, public userService: UserService, public tenantService: TenantService,

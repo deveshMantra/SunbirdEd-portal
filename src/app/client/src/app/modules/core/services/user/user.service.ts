@@ -142,6 +142,10 @@ export class UserService {
   get userid(): string {
     return this._userid;
   }
+
+  setUserId(userId: string) {
+    this._userid = userId;
+  }
   /**
   * get method to fetch sessionId.
   */
@@ -384,5 +388,13 @@ export class UserService {
 
   setUserFramework(framework) {
     this._userProfile.framework = framework;
+  }
+
+  registerUser(data) {
+    const options = {
+      url: this.config.urlConFig.URLS.USER.SIGN_UP_V1,
+      data: data
+    };
+    return this.learnerService.post(options);
   }
 }

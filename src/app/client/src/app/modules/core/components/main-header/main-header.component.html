@@ -64,6 +64,12 @@
                                 (click)="logout()">
                                 {{resourceService.frmelmnts?.lnk?.logout}}
                             </a>
+                          <a class="item" *ngIf="isSwitchUserAllowed" routerLink="profile/choose-user">
+                            Switch User
+                          </a>
+                          <a class="item" routerLink="profile/create-user">
+                            Add User
+                          </a>
                         </div>
                     </div>
                 </a>

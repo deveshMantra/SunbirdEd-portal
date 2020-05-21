@@ -3,12 +3,14 @@ import {mergeMap, map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { UserService, PermissionService, LearnerService } from '@sunbird/core';
 import { ResourceService, ConfigService, IUserProfile, IUserData, ServerResponse } from '@sunbird/shared';
+import {HttpClient} from "@angular/common/http";
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
-  constructor(private learnerService: LearnerService,
-    public userService: UserService, public configService: ConfigService) { }
+  constructor(private learnerService: LearnerService, private http: HttpClient,
+              public userService: UserService, public configService: ConfigService) {
+  }
   /**
    * This method is used to update profile picture of the user
    */
@@ -124,5 +126,30 @@ export class ProfileService {
       data: request,
     };
     return this.learnerService.post(options);
+  }
+
+  /**
+   * Fetches terms and condition config data
+   */
+  getTncConfig() {
+    const options = {
+      url: this.configService.urlConFig.URLS.SYSTEM_SETTING.TNC_CONFIG
+    };
+    return this.learnerService.get(options);
+  }
+
+
+  public fetchManagedUserList(request) {
+    const options = {
+      url: this.configService.urlConFig.URLS.USER.SEARCH_USER,
+      data: request,
+    };
+    return this.learnerService.post(options);
+  }
+
+  public initiateSwitchUser(userId) {
+    const url = this.configService.urlConFig.URLS.USER.SWITCH_USER + '/de35f92e-08a9-462d-b9e0-4d909c37227c';
+    console.log(url);
+    return this.http.get(url);
   }
 }

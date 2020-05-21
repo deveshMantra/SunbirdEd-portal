@@ -104,12 +104,11 @@ module.exports = function (app) {
     proxyObj()
   )
 
-
-  app.all('/learner/user/v1/signup',
+/*  app.all('/learner/user/v1/signup',
     healthService.checkDependantServiceHealth(['LEARNER', 'CASSANDRA']),
     permissionsHelper.checkPermission(),
     checkForValidUser()
-  )
+  )*/
 
   app.all('/learner/*',
     healthService.checkDependantServiceHealth(['LEARNER', 'CASSANDRA']),
