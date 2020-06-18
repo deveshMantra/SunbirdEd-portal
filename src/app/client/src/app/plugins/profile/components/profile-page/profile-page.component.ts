@@ -308,6 +308,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
+  navigate(url) {
+    this.router.navigate([url]);
+  }
+
   ngAfterViewInit() {
     setTimeout(() => {
       this.telemetryImpression = {

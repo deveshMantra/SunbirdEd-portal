@@ -1,12 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnDestroy } from '@angular/core';
-import { ResourceService, ToasterService } from '@sunbird/shared';
+import {IUserData, ResourceService, ToasterService} from '@sunbird/shared';
 import { ProfileService } from './../../services';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import * as _ from 'lodash-es';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IInteractEventObject, IInteractEventEdata } from '@sunbird/telemetry';
 import { UserService, FormService, SearchService } from '@sunbird/core';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import {Subject, Subscription, zip} from 'rxjs';
 
 @Component({
   selector: 'app-submit-teacher-details',
@@ -17,7 +18,7 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
 
   @Output() close = new EventEmitter<any>();
   @Output() showSuccessModal = new EventEmitter<any>();
-  @Input() userProfile: any;
+  userProfile: any;
   @Input() formAction: string;
   @ViewChild('userDetailsModal') userDetailsModal;
   public unsubscribe = new Subject<void>();
@@ -44,17 +45,25 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
   udiseObj;
   teacherObj;
   schoolObj;
+  userSubscription: Subscription;
 
   constructor(public resourceService: ResourceService, public toasterService: ToasterService,
     public profileService: ProfileService, formBuilder: FormBuilder,
     public userService: UserService, public formService: FormService,
-    public searchService: SearchService) {
+    public searchService: SearchService, private activatedRoute: ActivatedRoute) {
     this.sbFormBuilder = formBuilder;
   }
 
   ngOnInit() {
+    const queryParams = this.activatedRoute.snapshot.queryParams;
+    this.formAction = queryParams.formaction;
+    this.userSubscription = this.userService.userData$.subscribe((user: IUserData) => {
+      if (user.userProfile) {
+        this.userProfile = user.userProfile;
+        this.setFormDetails();
+      }
+    });
     this.setTelemetryData();
-    this.setFormDetails();
   }
 
   setTelemetryData() {
@@ -72,7 +81,173 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
 
   setFormDetails() {
     this.getFormDetails().subscribe((formData) => {
-      this.formData = formData;
+      this.formData = [
+        {
+          'code': 'state',
+          'dataType': 'text',
+          'name': 'state',
+          'label': 'Andaman',
+          'description': 'Select state',
+          'editable': true,
+          'inputType': 'select',
+          'required': true,
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 1
+        },
+        {
+          'code': 'district',
+          'dataType': 'text',
+          'name': 'district',
+          'label': 'District',
+          'description': 'Select district',
+          'editable': true,
+          'inputType': 'select',
+          'required': true,
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 2
+        },
+        {
+          'code': 'phoneNumber',
+          'dataType': 'number',
+          'name': 'phoneNumber',
+          'label': 'phoneNumber',
+          'description': 'Enter phone number',
+          'editable': true,
+          'inputType': 'input',
+          'fieldType': 'number',
+          'required': true,
+          'validation': [
+            {
+              'type': 'minlength',
+              'value': '10',
+              'message': 'Minimum length should be 10 numbers'
+            },
+            {
+              'type': 'maxlength',
+              'value': '10',
+              'message': 'Maximum length should be 10 numbers'
+            }
+          ],
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 3
+        },
+        {
+          'code': 'email',
+          'dataType': 'text',
+          'name': 'email',
+          'label': 'Email Id',
+          'description': 'Email Id',
+          'editable': true,
+          'fieldType': 'email',
+          'inputType': 'input',
+          'required': false,
+          'validation': [
+            {
+              'type': 'email',
+              'message': 'Please enter a valid email Id'
+            }
+          ],
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 4
+        },
+        {
+          'code': 'school',
+          'dataType': 'text',
+          'name': 'school',
+          'label': 'School/ Org name',
+          'description': 'Enter school name',
+          'editable': true,
+          'inputType': 'input',
+          'required': false,
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 5
+        },
+        {
+          'code': 'udiseId',
+          'dataType': 'text',
+          'name': 'udiseId',
+          'label': 'School UDISE ID/ Org ID',
+          'description': 'Enter UDISE ID',
+          'editable': true,
+          'inputType': 'input',
+          'required': false,
+          'validation': [
+            {
+              'type': 'minlength',
+              'value': '11',
+              'message': 'Minimum length should be 11 numbers'
+            },
+            {
+              'type': 'maxlength',
+              'value': '11',
+              'message': 'Maximum length should be 11 numbers'
+            },
+            {
+              'type': 'pattern',
+              'value': '^[0-9]*$',
+              'message': 'Only 11 digit number is allowed'
+            }
+          ],
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 6
+        },
+        {
+          'code': 'teacherId',
+          'dataType': 'text',
+          'name': 'teacherId',
+          'label': 'Enter ID as requested by your State/ Board/ Org',
+          'description': 'Enter ID',
+          'editable': true,
+          'inputType': 'input',
+          'required': true,
+          'displayProperty': 'Editable',
+          'visible': true,
+          'renderingHints': {
+            'fieldColumnWidth': 'twelve'
+          },
+          'index': 7
+        },
+        {
+          'code': 'checkbox',
+          'dataType': 'text',
+          'name': 'tnc',
+          'label': 'I understand and accept the {env} Terms of Use.',
+          'description': '',
+          'editable': true,
+          'inputType': 'checkbox',
+          'required': true,
+          'displayProperty': 'Editable',
+          'visible': false,
+          'renderingHints': {
+            'fieldColumnWidth': 'tweleve'
+          },
+          'index': 8
+        }
+      ];
       this.initializeFormFields();
     }, (err) => {
       this.toasterService.error(_.get(this.resourceService, 'messages.emsg.m0005'));
@@ -128,6 +303,9 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
         case 'pattern':
           returnValue.push(Validators.pattern(validationData.value));
           break;
+        case 'email':
+          returnValue.push(Validators.email);
+          break;
       }
     });
     return returnValue;
@@ -169,7 +347,173 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
       (data: string) => {
         if (_.get(this.stateControl, 'value.id')) {
           this.getFormDetails(_.get(this.stateControl, 'value.id')).subscribe((formData) => {
-            this.formData = formData;
+            this.formData = [
+              {
+                'code': 'state',
+                'dataType': 'text',
+                'name': 'state',
+                'label': 'Andaman',
+                'description': 'Select state',
+                'editable': true,
+                'inputType': 'select',
+                'required': true,
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 1
+              },
+              {
+                'code': 'district',
+                'dataType': 'text',
+                'name': 'district',
+                'label': 'District',
+                'description': 'Select district',
+                'editable': true,
+                'inputType': 'select',
+                'required': true,
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 2
+              },
+              {
+                'code': 'phoneNumber',
+                'dataType': 'number',
+                'name': 'phoneNumber',
+                'label': 'phoneNumber',
+                'description': 'Enter phone number',
+                'editable': true,
+                'inputType': 'input',
+                'fieldType': 'number',
+                'required': true,
+                'validation': [
+                  {
+                    'type': 'minlength',
+                    'value': '10',
+                    'message': 'Minimum length should be 10 numbers'
+                  },
+                  {
+                    'type': 'maxlength',
+                    'value': '10',
+                    'message': 'Maximum length should be 10 numbers'
+                  }
+                ],
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 3
+              },
+              {
+                'code': 'email',
+                'dataType': 'text',
+                'name': 'email',
+                'label': 'Email Id',
+                'description': 'Email Id',
+                'editable': true,
+                'fieldType': 'email',
+                'inputType': 'input',
+                'required': false,
+                'validation': [
+                  {
+                    'type': 'email',
+                    'message': 'Please enter a valid email Id'
+                  }
+                ],
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 4
+              },
+              {
+                'code': 'school',
+                'dataType': 'text',
+                'name': 'school',
+                'label': 'School/ Org name',
+                'description': 'Enter school name',
+                'editable': true,
+                'inputType': 'input',
+                'required': false,
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 5
+              },
+              {
+                'code': 'udiseId',
+                'dataType': 'text',
+                'name': 'udiseId',
+                'label': 'School UDISE ID/ Org ID',
+                'description': 'Enter UDISE ID',
+                'editable': true,
+                'inputType': 'input',
+                'required': false,
+                'validation': [
+                  {
+                    'type': 'minlength',
+                    'value': '11',
+                    'message': 'Minimum length should be 11 numbers'
+                  },
+                  {
+                    'type': 'maxlength',
+                    'value': '11',
+                    'message': 'Maximum length should be 11 numbers'
+                  },
+                  {
+                    'type': 'pattern',
+                    'value': '^[0-9]*$',
+                    'message': 'Only 11 digit number is allowed'
+                  }
+                ],
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 6
+              },
+              {
+                'code': 'teacherId',
+                'dataType': 'text',
+                'name': 'teacherId',
+                'label': 'Enter ID as requested by your State/ Board/ Org',
+                'description': 'Enter ID',
+                'editable': true,
+                'inputType': 'input',
+                'required': true,
+                'displayProperty': 'Editable',
+                'visible': true,
+                'renderingHints': {
+                  'fieldColumnWidth': 'twelve'
+                },
+                'index': 7
+              },
+              {
+                'code': 'checkbox',
+                'dataType': 'text',
+                'name': 'tnc',
+                'label': 'I understand and accept the {env} Terms of Use.',
+                'description': '',
+                'editable': true,
+                'inputType': 'checkbox',
+                'required': true,
+                'displayProperty': 'Editable',
+                'visible': false,
+                'renderingHints': {
+                  'fieldColumnWidth': 'tweleve'
+                },
+                'index': 8
+              }
+            ];
           });
         }
         if (this.stateControl.status === 'VALID' && stateValue !== this.stateControl.value.code) {
@@ -272,7 +616,6 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
 
   updateProfile(data) {
     this.profileService.updateProfile(data).subscribe(res => {
-      this.closeModal();
       this.showSuccessModal.emit();
       if (this.formAction === 'update') {
         this.toasterService.success(this.resourceService.messages.smsg.m0037);
@@ -293,5 +636,8 @@ export class SubmitTeacherDetailsComponent implements OnInit, OnDestroy {
     this.unsubscribe.next();
     this.unsubscribe.complete();
     this.userDetailsModal.deny();
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
   }
 }
