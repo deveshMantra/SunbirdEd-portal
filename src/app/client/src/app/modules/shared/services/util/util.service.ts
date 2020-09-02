@@ -309,4 +309,61 @@ export class UtilService {
   redirect(redirectUrl) {
     window.location.href = redirectUrl;
   }
+
+  processData123(sections, keys) {
+    const facetObj = {};
+    _.forEach(keys, (key) => {
+      _.forEach(sections, (section) => {
+        if (section && section.facets) {
+          _.forEach(section.facets, (facet) => {
+            if (facet.name === key) {
+              if (facetObj[key]) {
+                facetObj[key].push(...facet.values);
+              } else {
+                facetObj[key] = [];
+                facetObj[key].push(...facet.values);
+              }
+            }
+          });
+        }
+      });
+    });
+    return facetObj;
+  }
+
+
+  processData(sections, keys) {
+    // send only unique data
+    const facetObj = {};
+    _.forEach(sections, (section) => {
+      if (section && section.facets) {
+        _.forEach(section.facets, (facet) => {
+          if (_.indexOf(keys, facet.name) > -1) {
+            if (facetObj[facet.name]) {
+              facetObj[facet.name].push(...facet.values);
+            } else {
+              facetObj[facet.name] = [];
+              facetObj[facet.name].push(...facet.values);
+            }
+          }
+        });
+      }
+    });
+
+/*    _.forIn(facetObj, (value, key) => {
+      facetObj[key] = _.uniqBy(value, 'name');
+    });*/
+
+/*
+    _.forEach(facetObj, (facet) => {
+      _.uniqBy(facet, 'name');
+    });
+*/
+    return facetObj;
+  }
+
+  removeDuplicates(data, key) {
+    return _.uniqBy(data, key);
+  }
+
 }
