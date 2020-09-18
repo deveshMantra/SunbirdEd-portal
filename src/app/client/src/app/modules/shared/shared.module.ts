@@ -7,7 +7,7 @@ import {
   NoResultComponent, AppLoaderComponent, CardComponent,
   CardCreationComponent, ShareLinkComponent, BrowserCompatibilityComponent, QrCodeModalComponent, RedirectComponent,
   CustomMultiSelectComponent, InstallAppComponent, LockInfoPopupComponent, BatchCardComponent, AccountMergeModalComponent,
-  OfflineBannerComponent, OfflineApplicationDownloadComponent, FullPageModalComponent, ConfirmPopupComponent, SelectOptionGroupComponent
+  OfflineBannerComponent,SbDatatableComponent,OnDemandReportsComponent, OfflineApplicationDownloadComponent, FullPageModalComponent, ConfirmPopupComponent, SelectOptionGroupComponent
 } from './components';
 import {
   ConfigService, ResourceService, ToasterService, WindowScrollService, BrowserCacheTtlService,
@@ -26,6 +26,7 @@ import { CdnprefixPipe } from './pipes/cdnprefix.pipe';
 import { HighlightTextDirective } from './directives/highlight-text/highlight-text.directive';
 import { AppLandingSectionComponent } from './components/app-landing-section/app-landing-section.component';
 import { TranslateModule, TranslateStore } from '@ngx-translate/core';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
   imports: [
@@ -33,7 +34,7 @@ import { TranslateModule, TranslateStore } from '@ngx-translate/core';
     SuiSelectModule, SuiModalModule, SuiAccordionModule, SuiPopupModule, SuiDropdownModule, SuiProgressModule,
     SuiRatingModule, SuiCollapseModule,
     FormsModule,
-    TelemetryModule,
+    TelemetryModule,NgxDatatableModule,
     TranslateModule.forChild()
   ],
   declarations: [AppLoaderComponent, DateFormatPipe,
@@ -41,14 +42,14 @@ import { TranslateModule, TranslateStore } from '@ngx-translate/core';
     ShareLinkComponent, BrowserCompatibilityComponent, QrCodeModalComponent, CdnprefixPipe, RedirectComponent, CustomMultiSelectComponent,
     InstallAppComponent, LockInfoPopupComponent, ContentDirectionDirective, OfflineBannerComponent,
     OfflineApplicationDownloadComponent, HighlightTextDirective, FullPageModalComponent, AccountMergeModalComponent, SortByPipe,
-    ConfirmPopupComponent, SelectOptionGroupComponent, AppLandingSectionComponent, MarkdownDirective],
+    ConfirmPopupComponent,SbDatatableComponent, SelectOptionGroupComponent, AppLandingSectionComponent, MarkdownDirective, OnDemandReportsComponent],
   exports: [AppLoaderComponent, DateFormatPipe, TranslateModule,
     BatchCardComponent, NoResultComponent, CardComponent, CardCreationComponent, FilterPipe,
     OfflineApplicationDownloadComponent, HighlightTextDirective, FullPageModalComponent, AccountMergeModalComponent, SortByPipe,
     ConfirmPopupComponent, SelectOptionGroupComponent, AppLandingSectionComponent,
     ShareLinkComponent, BrowserCompatibilityComponent, QrCodeModalComponent, CdnprefixPipe, InterpolatePipe, RedirectComponent,
     CustomMultiSelectComponent, InstallAppComponent, LockInfoPopupComponent, ContentDirectionDirective, OfflineBannerComponent,
-    MarkdownDirective]
+    MarkdownDirective,SbDatatableComponent,OnDemandReportsComponent, NgxDatatableModule]
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders {
